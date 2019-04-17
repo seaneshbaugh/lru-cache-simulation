@@ -1,24 +1,23 @@
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <time.h>
 
 typedef struct {
   int name;
   int lastUsedTime;
-  unsigned long long value;
+  uint64_t value;
 } CacheItem;
 
-int main() {
-  unsigned long long values[6];
-
-  FILE *random = fopen("/dev/random", "rb");
-
-  if (!random) {
-    printf("Could not open \"/dev/random\"\n");
-  }
+int main(int argc, char** argv) {
+  uint64_t values[6];
 
   for (int i = 0; i < 6; i++) {
-    fread(&values[i], sizeof(values[i]), 1, random);
+    uint64_t randomLo = (uint64_t)arc4random();
+    uint64_t randomHi = (uint64_t)arc4random();
+
+    values[i] = (int64_t)((randomHi << 31) | (randomLo >> 1));
 
     printf("%d - %016llx\n", i, values[i]);
   }
@@ -28,11 +27,7 @@ int main() {
   int n = 0;
 
   while (n < 100) {
-    unsigned long long r;
-
-    fread(&r, sizeof(r), 1, random);
-
-    r = r % 6;
+    uint32_t r = arc4random_uniform(6);
 
     bool hit = false;
 
